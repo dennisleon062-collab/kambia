@@ -306,8 +306,12 @@ create trigger trg_bloquear_movimientos_dia_cerrado
 
 -- ============================================================================
 -- SALDOS CALCULADOS (nunca almacenados): vista que suma/resta movimientos
+-- security_invoker=true: la vista corre con los permisos de quien consulta,
+-- no del dueño de la vista, para que SÍ respete el RLS de las tablas base
+-- (sin esto, cualquiera sin login podría leer los saldos vía la API).
 -- ============================================================================
-create or replace view v_saldos_cuentas as
+create or replace view v_saldos_cuentas
+with (security_invoker = true) as
 select
   c.id as cuenta_id,
   c.nombre as cuenta_nombre,
@@ -330,7 +334,8 @@ left join (
 ) salidas on salidas.cuenta_id = c.id;
 
 -- Saldo pendiente de cuentas por cobrar = monto_original - SUM(abonos)
-create or replace view v_cuentas_por_cobrar_saldo as
+create or replace view v_cuentas_por_cobrar_saldo
+with (security_invoker = true) as
 select
   cxc.id,
   cxc.cliente_texto,
@@ -348,7 +353,8 @@ left join (
 ) ab on ab.cuenta_por_cobrar_id = cxc.id;
 
 -- TC vigente más reciente
-create or replace view v_tipo_cambio_vigente as
+create or replace view v_tipo_cambio_vigente
+with (security_invoker = true) as
 select tc_usd, tc_eur, fecha_hora
 from tipos_cambio
 order by fecha_hora desc
