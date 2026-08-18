@@ -3,23 +3,10 @@
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
 import { getUsuarioActual } from "@/lib/auth";
-import { getTipoCambioVigente } from "@/lib/queries/tipo-cambio";
 import { getTasaComision, calcularComision } from "@/lib/queries/comisiones";
 import type { MovimientoTipo } from "@/types/database.types";
 
 type Resultado = { error: string | null };
-
-async function getTipoCambioVigenteId(): Promise<{ id: string; tc_usd: number; tc_eur: number } | null> {
-  const supabase = await createClient();
-  const { data, error } = await supabase
-    .from("tipos_cambio")
-    .select("id, tc_usd, tc_eur")
-    .order("fecha_hora", { ascending: false })
-    .limit(1)
-    .maybeSingle();
-  if (error) throw error;
-  return data;
-}
 
 function num(formData: FormData, campo: string): number | null {
   const v = formData.get(campo);
@@ -83,9 +70,11 @@ export async function registrarMovimiento(formData: FormData): Promise<Resultado
     const cuentaOrigenId = str(fd, "cuenta_origen_id");
     const cuentaDestinoId = str(fd, "cuenta_destino_id");
     const montoOrigen = num(fd, "monto_origen");
+    let montoDestino = num(fd, "monto_destino");
+    let tcAplicado = num(fd, "tc_aplicado");
 
     if (!cuentaOrigenId || !cuentaDestinoId) return { error: "Seleccione cuenta origen y destino" };
-    if (!montoOrigen || montoOrigen <= 0) return { error: "Ingrese un monto válido" };
+    if (!montoOrigen || montoOrigen <= 0) return { error: "Ingrese el monto que entrega" };
 
     const [{ data: cOrigen }, { data: cDestino }] = await Promise.all([
       supabase.from("cuentas").select("*").eq("id", cuentaOrigenId).single(),
@@ -93,25 +82,20 @@ export async function registrarMovimiento(formData: FormData): Promise<Resultado
     ]);
     if (!cOrigen || !cDestino) return { error: "Cuenta no encontrada" };
 
-    const tc = await getTipoCambioVigenteId();
-    if (!tc) return { error: "No hay tipo de cambio configurado" };
-
-    let montoDestino: number;
-    if (tipoOp === "compra_divisa") {
-      // Soles -> divisa: monto_destino = soles / tc
-      const tasa = cDestino.moneda_codigo === "EUR" ? tc.tc_eur : tc.tc_usd;
-      montoDestino = montoOrigen / tasa;
-    } else if (tipoOp === "venta_divisa") {
-      // Divisa -> soles: monto_destino = divisa * tc
-      const tasa = cOrigen.moneda_codigo === "EUR" ? tc.tc_eur : tc.tc_usd;
-      montoDestino = montoOrigen * tasa;
-    } else {
-      // cruce_divisas: EUR <-> USD vía cruce de ambos TC en soles
-      const tasaOrigen = cOrigen.moneda_codigo === "EUR" ? tc.tc_eur : tc.tc_usd;
-      const tasaDestino = cDestino.moneda_codigo === "EUR" ? tc.tc_eur : tc.tc_usd;
-      montoDestino = (montoOrigen * tasaOrigen) / tasaDestino;
+    // El TC de esta operación es el que se negoció en el momento (escrito a mano
+    // o calculado a partir de los dos montos) — nunca se toma de `tipos_cambio`,
+    // que es solo la referencia del cierre diario.
+    if (!montoDestino || montoDestino <= 0) {
+      if (!tcAplicado || tcAplicado <= 0) {
+        return { error: "Ingrese el TC de la operación o el monto que recibe" };
+      }
+      montoDestino = tipoOp === "venta_divisa" ? montoOrigen * tcAplicado : montoOrigen / tcAplicado;
     }
     montoDestino = Math.round(montoDestino * 100) / 100;
+
+    if (!tcAplicado || tcAplicado <= 0) {
+      tcAplicado = tipoOp === "venta_divisa" ? montoDestino / montoOrigen : montoOrigen / montoDestino;
+    }
 
     const { error } = await supabase.from("movimientos").insert({
       tipo: tipoOp,
@@ -123,7 +107,7 @@ export async function registrarMovimiento(formData: FormData): Promise<Resultado
       cuenta_destino_id: cuentaDestinoId,
       moneda_destino: cDestino.moneda_codigo,
       monto_destino: montoDestino,
-      tipo_cambio_id: tc.id,
+      tc_aplicado: Math.round(tcAplicado * 10000) / 10000,
       comentario,
     });
 

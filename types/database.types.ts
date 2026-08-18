@@ -78,6 +78,7 @@ export interface Movimiento {
   moneda_destino: MonedaCodigo | null;
   monto_destino: number | null;
   tipo_cambio_id: string | null;
+  tc_aplicado: number | null;
   comision_calculada: number | null;
   cuenta_por_cobrar_id: string | null;
   estado: MovimientoEstado;

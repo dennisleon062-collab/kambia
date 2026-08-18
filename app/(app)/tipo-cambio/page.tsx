@@ -15,6 +15,10 @@ export default async function TipoCambioPage() {
     <>
       <Header nombre={usuario.nombre} titulo="Tipo de cambio" />
       <main className="flex flex-col gap-4 p-4">
+        <p className="text-sm text-ink/60">
+          Este es el TC de referencia para el cierre diario, no el de cada operación. Cada compra o
+          venta de divisa trae su propio TC al momento de registrarla.
+        </p>
         <TipoCambioForm tcUsdActual={vigente?.tc_usd ?? null} tcEurActual={vigente?.tc_eur ?? null} />
 
         <section className="flex flex-col gap-2">

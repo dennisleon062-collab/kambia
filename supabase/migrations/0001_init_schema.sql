@@ -132,6 +132,10 @@ create table movimientos (
   monto_destino numeric(14, 2) check (monto_destino is null or monto_destino > 0),
 
   tipo_cambio_id uuid references tipos_cambio (id),
+  -- TC negociado de esta operación puntual (compra_divisa/venta_divisa/cruce_divisas).
+  -- El TC de `tipos_cambio` es solo la referencia para el cierre diario (variación
+  -- cambiaria); cada operación trae su propio TC, no el de la tabla tipos_cambio.
+  tc_aplicado numeric(12, 4),
   comision_calculada numeric(14, 2),
 
   cuenta_por_cobrar_id uuid references cuentas_por_cobrar (id),
