@@ -48,10 +48,10 @@ export function OfflineQueueStatus() {
   return (
     <div
       className={`mx-4 mt-3 rounded-lg px-3 py-2 text-sm ${
-        enLinea ? "bg-amber-50 text-amber-800" : "bg-neutral-200 text-neutral-700"
+        enLinea ? "bg-amber-bg text-amber-text" : "bg-ink/10 text-ink/70"
       }`}
     >
-      {!enLinea && "Sin conexión — los registros se guardan en el celular y se envían al reconectar."}
+      {!enLinea && "Sin conexión: los registros se guardan en el celular y se envían al reconectar."}
       {enLinea && pendientes > 0 && (sincronizando ? "Sincronizando…" : `${pendientes} registro(s) pendiente(s) de enviar`)}
     </div>
   );

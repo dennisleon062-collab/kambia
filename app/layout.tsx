@@ -3,7 +3,7 @@ import "./globals.css";
 
 export const metadata: Metadata = {
   title: "Kambia",
-  description: "Control de dinero — casa de cambio",
+  description: "Control de dinero de la casa de cambio, día por día.",
 };
 
 export const viewport: Viewport = {

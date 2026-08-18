@@ -1,41 +1,53 @@
+@import url('https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,500;12..96,600;12..96,700;12..96,800&family=IBM+Plex+Mono:wght@400;500;600&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
-
-:root {
-  --brand: #0f9d58;
-}
 
 html {
   -webkit-text-size-adjust: 100%;
 }
 
 body {
-  @apply bg-neutral-50 text-neutral-900;
+  @apply bg-paper text-ink;
+  font-family: 'Bricolage Grotesque', system-ui, sans-serif;
+}
+
+.font-num {
+  font-family: 'IBM Plex Mono', ui-monospace, monospace;
+  font-variant-numeric: tabular-nums;
 }
 
 input,
 select,
 textarea {
-  font-size: 16px; /* evita zoom automático en iOS */
+  font-size: 16px; /* evita zoom automatico en iOS */
 }
 
 .btn-primary {
-  @apply w-full rounded-xl bg-brand-600 px-4 py-3 text-center text-base font-semibold text-white active:bg-brand-700 disabled:opacity-50;
+  @apply w-full rounded-2xl bg-lime px-4 py-4 text-center text-base font-bold text-ink active:bg-lime-dark disabled:opacity-50;
 }
 
 .btn-secondary {
-  @apply w-full rounded-xl border border-neutral-300 bg-white px-4 py-3 text-center text-base font-semibold text-neutral-800 active:bg-neutral-100;
+  @apply w-full rounded-2xl border border-ink/10 bg-white px-4 py-4 text-center text-base font-semibold text-ink active:bg-paper;
 }
 
 .field-label {
-  @apply mb-1 block text-sm font-medium text-neutral-600;
+  @apply mb-1 block text-sm font-medium text-ink/50;
 }
 
 .field-input {
-  @apply w-full rounded-lg border border-neutral-300 px-3 py-3 text-lg;
+  @apply w-full rounded-xl border border-ink/15 bg-white px-3 py-3 text-lg text-ink;
 }
 
 .card {
-  @apply rounded-2xl border border-neutral-200 bg-white p-4 shadow-sm;
+  @apply rounded-2xl border border-ink/10 bg-white p-4 shadow-sm;
+}
+
+.pill {
+  @apply rounded-full border border-ink/10 bg-white px-3.5 py-1.5 text-[13px] text-ink/70;
+}
+
+.pill-active {
+  @apply rounded-full bg-ink px-3.5 py-1.5 text-[13px] font-semibold text-paper;
 }

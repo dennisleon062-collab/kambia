@@ -51,7 +51,7 @@ export function EntregarFondoForm() {
           className="field-input"
         />
       </div>
-      {error && <p className="text-sm text-red-600">{error}</p>}
+      {error && <p className="text-sm text-rust">{error}</p>}
       <button type="submit" className="btn-primary" disabled={pending}>
         {pending ? "Guardando…" : "Entregar fondo"}
       </button>
@@ -66,7 +66,7 @@ export function DevolverFondoForm({ fondo }: { fondo: FondoDiario }) {
   return (
     <div className="card flex flex-col gap-3">
       <h2 className="font-semibold">Fondo de hoy</h2>
-      <p className="text-sm text-neutral-600">
+      <p className="text-sm text-ink/60">
         Entregado: <span className="font-mono font-semibold">S/ {fondo.monto_entregado}</span>
       </p>
 
@@ -94,7 +94,7 @@ export function DevolverFondoForm({ fondo }: { fondo: FondoDiario }) {
               className="field-input"
             />
           </div>
-          {error && <p className="text-sm text-red-600">{error}</p>}
+          {error && <p className="text-sm text-rust">{error}</p>}
           <button type="submit" className="btn-primary" disabled={pending}>
             {pending ? "Guardando…" : "Registrar devolución"}
           </button>
@@ -103,7 +103,7 @@ export function DevolverFondoForm({ fondo }: { fondo: FondoDiario }) {
 
       {fondo.estado !== "pendiente_devolucion" && (
         <>
-          <p className="text-sm text-neutral-600">
+          <p className="text-sm text-ink/60">
             Devuelto: <span className="font-mono font-semibold">S/ {fondo.monto_devuelto}</span>
           </p>
           <EstadoBadge estado={fondo.estado} diferencia={fondo.diferencia} />
@@ -122,7 +122,7 @@ export function DevolverFondoForm({ fondo }: { fondo: FondoDiario }) {
                 Si no se resuelve, Juan la asume de su ganancia del día
               </label>
               <input id="observacion" name="observacion" placeholder="Observación" className="field-input" />
-              {asumido.error && <p className="text-sm text-red-600">{asumido.error}</p>}
+              {asumido.error && <p className="text-sm text-rust">{asumido.error}</p>}
               <button type="submit" className="btn-secondary" disabled={asumido.pending}>
                 {asumido.pending ? "Guardando…" : "Marcar como asumido por Juan"}
               </button>
@@ -138,7 +138,7 @@ function EstadoBadge({ estado, diferencia }: { estado: string; diferencia: numbe
   const estilos: Record<string, string> = {
     cuadrado: "bg-brand-100 text-brand-700",
     investigando: "bg-amber-100 text-amber-800",
-    asumido_por_juan: "bg-neutral-200 text-neutral-700",
+    asumido_por_juan: "bg-ink/10 text-ink/70",
   };
   const textos: Record<string, string> = {
     cuadrado: "Cuadrado",

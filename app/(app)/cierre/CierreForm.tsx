@@ -38,7 +38,7 @@ export function CierreForm({ cuentas }: { cuentas: CuentaFisicaConSaldo[] }) {
   }
 
   if (pendientes.length === 0) {
-    return <div className="card text-sm text-neutral-500">Todas las cuentas físicas ya fueron cerradas hoy.</div>;
+    return <div className="card text-sm text-ink/50">Todas las cuentas físicas ya fueron cerradas hoy.</div>;
   }
 
   return (
@@ -48,7 +48,7 @@ export function CierreForm({ cuentas }: { cuentas: CuentaFisicaConSaldo[] }) {
           <input type="hidden" name="cuenta_id" value={c.cuenta_id} />
           <div className="flex items-center justify-between">
             <span className="font-semibold">{c.cuenta_nombre}</span>
-            <span className="font-mono text-sm text-neutral-500">
+            <span className="font-mono text-sm text-ink/50">
               Sistema: {formatMonto(c.saldo, c.moneda_codigo)}
             </span>
           </div>
@@ -92,8 +92,8 @@ export function CierreForm({ cuentas }: { cuentas: CuentaFisicaConSaldo[] }) {
         </div>
       ))}
 
-      {error && <p className="text-sm text-red-600">{error}</p>}
-      {ok && <p className="text-sm text-brand-700">Cierre confirmado — el día queda bloqueado ✓</p>}
+      {error && <p className="text-sm text-rust">{error}</p>}
+      {ok && <p className="text-sm text-brand-700">Cierre confirmado: el día queda bloqueado ✓</p>}
 
       <button type="submit" className="btn-primary" disabled={pending}>
         {pending ? "Cerrando…" : "Confirmar cierre del día"}

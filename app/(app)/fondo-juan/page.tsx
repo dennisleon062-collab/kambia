@@ -20,14 +20,14 @@ export default async function FondoJuanPage() {
         {fondoHoy && <DevolverFondoForm fondo={fondoHoy} />}
 
         <section className="flex flex-col gap-2">
-          <h2 className="text-sm font-semibold uppercase tracking-wide text-neutral-500">Historial</h2>
-          <div className="card divide-y divide-neutral-100">
+          <h2 className="text-sm font-semibold uppercase tracking-wide text-ink/50">Historial</h2>
+          <div className="card divide-y divide-ink/10">
             {historial.map((f) => (
               <div key={f.id} className="flex items-center justify-between py-2 text-sm first:pt-0 last:pb-0">
-                <span className="text-neutral-500">{f.fecha}</span>
+                <span className="text-ink/50">{f.fecha}</span>
                 <span>
                   Entregado S/ {f.monto_entregado} · Devuelto{" "}
-                  {f.monto_devuelto !== null ? `S/ ${f.monto_devuelto}` : "—"}
+                  {f.monto_devuelto !== null ? `S/ ${f.monto_devuelto}` : "pendiente"}
                 </span>
                 <span className="font-medium">{f.estado}</span>
               </div>

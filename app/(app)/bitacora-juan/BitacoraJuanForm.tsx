@@ -22,7 +22,7 @@ export function BitacoraJuanForm({ fondoDiarioId }: { fondoDiarioId: string }) {
 
     startTransition(async () => {
       if (typeof navigator !== "undefined" && !navigator.onLine) {
-        encolar(campos, `Bitácora Juan — ${campos.cliente_texto ?? campos.tipo_operacion}`);
+        encolar(campos, `Bitácora: ${campos.cliente_texto ?? campos.tipo_operacion}`);
         setOk(true);
         (e.target as HTMLFormElement).reset();
         return;
@@ -37,7 +37,7 @@ export function BitacoraJuanForm({ fondoDiarioId }: { fondoDiarioId: string }) {
         (e.target as HTMLFormElement).reset();
         router.refresh();
       } catch {
-        encolar(campos, `Bitácora Juan — ${campos.cliente_texto ?? campos.tipo_operacion}`);
+        encolar(campos, `Bitácora: ${campos.cliente_texto ?? campos.tipo_operacion}`);
         setOk(true);
         (e.target as HTMLFormElement).reset();
       }
@@ -65,7 +65,7 @@ export function BitacoraJuanForm({ fondoDiarioId }: { fondoDiarioId: string }) {
             Moneda origen
           </label>
           <select id="moneda_origen" name="moneda_origen" className="field-input">
-            <option value="">—</option>
+            <option value="">sin especificar</option>
             <option value="PEN">PEN</option>
             <option value="USD">USD</option>
             <option value="EUR">EUR</option>
@@ -84,7 +84,7 @@ export function BitacoraJuanForm({ fondoDiarioId }: { fondoDiarioId: string }) {
             Moneda destino
           </label>
           <select id="moneda_destino" name="moneda_destino" className="field-input">
-            <option value="">—</option>
+            <option value="">sin especificar</option>
             <option value="PEN">PEN</option>
             <option value="USD">USD</option>
             <option value="EUR">EUR</option>
@@ -109,7 +109,7 @@ export function BitacoraJuanForm({ fondoDiarioId }: { fondoDiarioId: string }) {
         </label>
         <input id="comentario" name="comentario" className="field-input" />
       </div>
-      {error && <p className="text-sm text-red-600">{error}</p>}
+      {error && <p className="text-sm text-rust">{error}</p>}
       {ok && <p className="text-sm text-brand-700">Registrado ✓</p>}
       <button type="submit" className="btn-primary" disabled={pending}>
         {pending ? "Guardando…" : "Registrar"}

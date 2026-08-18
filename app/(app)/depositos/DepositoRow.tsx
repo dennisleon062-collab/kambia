@@ -40,13 +40,13 @@ export function DepositoRow({
       <div className="flex items-center justify-between">
         <div>
           <p className="font-semibold">{deposito.cuentas?.nombre ?? "Banco"}</p>
-          <p className="text-xs text-neutral-500">{formatFechaHora(deposito.fecha_hora)}</p>
+          <p className="text-xs text-ink/50">{formatFechaHora(deposito.fecha_hora)}</p>
         </div>
         <span className="font-mono text-lg font-semibold">
           {formatMonto(deposito.monto_destino ?? 0, deposito.moneda_destino ?? "PEN")}
         </span>
       </div>
-      {deposito.comentario && <p className="text-sm text-neutral-600">{deposito.comentario}</p>}
+      {deposito.comentario && <p className="text-sm text-ink/60">{deposito.comentario}</p>}
 
       {!abierto && (
         <button type="button" className="btn-secondary" onClick={() => setAbierto(true)}>
@@ -55,7 +55,7 @@ export function DepositoRow({
       )}
 
       {abierto && (
-        <form onSubmit={handleSubmit} className="flex flex-col gap-2 border-t border-neutral-100 pt-3">
+        <form onSubmit={handleSubmit} className="flex flex-col gap-2 border-t border-ink/10 pt-3">
           <div>
             <label className="field-label" htmlFor={`cliente_${deposito.id}`}>
               Cliente
@@ -83,12 +83,12 @@ export function DepositoRow({
               </option>
               {cxcAbiertas.map((c) => (
                 <option key={c.id} value={c.id}>
-                  {c.cliente_texto} — pendiente {c.saldo_pendiente} {c.moneda}
+                  {c.cliente_texto} (pendiente {c.saldo_pendiente} {c.moneda})
                 </option>
               ))}
             </select>
           )}
-          {error && <p className="text-sm text-red-600">{error}</p>}
+          {error && <p className="text-sm text-rust">{error}</p>}
           <div className="flex gap-2">
             <button type="submit" className="btn-primary" disabled={pending}>
               {pending ? "Guardando…" : "Confirmar"}

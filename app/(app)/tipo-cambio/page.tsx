@@ -18,16 +18,16 @@ export default async function TipoCambioPage() {
         <TipoCambioForm tcUsdActual={vigente?.tc_usd ?? null} tcEurActual={vigente?.tc_eur ?? null} />
 
         <section className="flex flex-col gap-2">
-          <h2 className="text-sm font-semibold uppercase tracking-wide text-neutral-500">
+          <h2 className="text-sm font-semibold uppercase tracking-wide text-ink/50">
             Historial
           </h2>
-          <div className="card divide-y divide-neutral-100">
+          <div className="card divide-y divide-ink/10">
             {historial.length === 0 && (
-              <p className="py-2 text-sm text-neutral-500">Sin registros aún.</p>
+              <p className="py-2 text-sm text-ink/50">Sin registros aún.</p>
             )}
             {historial.map((tc) => (
               <div key={tc.id} className="flex items-center justify-between py-2 text-sm first:pt-0 last:pb-0">
-                <span className="text-neutral-500">{formatFechaHora(tc.fecha_hora)}</span>
+                <span className="text-ink/50">{formatFechaHora(tc.fecha_hora)}</span>
                 <span className="font-mono font-semibold">
                   USD {tc.tc_usd.toFixed(4)} · EUR {tc.tc_eur.toFixed(4)}
                 </span>

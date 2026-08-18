@@ -16,7 +16,7 @@ export default async function DepositosPage() {
       <Header nombre={usuario.nombre} titulo="Depósitos sin identificar" />
       <main className="flex flex-col gap-3 p-4">
         {depositos.length === 0 && (
-          <div className="card text-sm text-neutral-500">No hay depósitos pendientes de identificar.</div>
+          <div className="card text-sm text-ink/50">No hay depósitos pendientes de identificar.</div>
         )}
         {depositos.map((d) => (
           <DepositoRow key={d.id} deposito={d} cxcAbiertas={cxcAbiertas} />

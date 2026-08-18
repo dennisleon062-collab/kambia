@@ -54,7 +54,7 @@ export function NuevaTransaccionForm({
 
     startTransition(async () => {
       if (typeof navigator !== "undefined" && !navigator.onLine) {
-        encolar(campos, `${tipo} — ${campos.cliente_texto ?? ""}`);
+        encolar(campos, `${tipo}: ${campos.cliente_texto ?? "sin cliente"}`);
         setOk(true);
         (e.target as HTMLFormElement).reset();
         setTipo("");
@@ -73,7 +73,7 @@ export function NuevaTransaccionForm({
         router.refresh();
       } catch {
         // Falla de red a mitad de envío: no perder el registro.
-        encolar(campos, `${tipo} — ${campos.cliente_texto ?? ""}`);
+        encolar(campos, `${tipo}: ${campos.cliente_texto ?? "sin cliente"}`);
         setOk(true);
         (e.target as HTMLFormElement).reset();
         setTipo("");
@@ -124,7 +124,7 @@ export function NuevaTransaccionForm({
             }
           />
           <CampoMonto name="monto_origen" label="Monto que entrega el cliente" />
-          <p className="text-xs text-neutral-500">
+          <p className="text-xs text-ink/50">
             El monto a entregar se calcula automáticamente con el tipo de cambio vigente.
           </p>
         </>
@@ -184,7 +184,7 @@ export function NuevaTransaccionForm({
               </option>
               {cxcAbiertas.map((c) => (
                 <option key={c.id} value={c.id}>
-                  {c.cliente_texto} — pendiente {c.saldo_pendiente} {c.moneda}
+                  {c.cliente_texto} (pendiente {c.saldo_pendiente} {c.moneda})
                 </option>
               ))}
             </select>
@@ -241,7 +241,7 @@ export function NuevaTransaccionForm({
         </div>
       )}
 
-      {error && <p className="text-sm text-red-600">{error}</p>}
+      {error && <p className="text-sm text-rust">{error}</p>}
       {ok && <p className="text-sm text-brand-700">Transacción registrada ✓</p>}
 
       {tipo && (

@@ -62,7 +62,7 @@ export function TipoCambioForm({
           onChange={(e) => setTcEur(e.target.value)}
         />
       </div>
-      {error && <p className="text-sm text-red-600">{error}</p>}
+      {error && <p className="text-sm text-rust">{error}</p>}
       {ok && <p className="text-sm text-brand-700">Tipo de cambio actualizado ✓</p>}
       <button type="submit" className="btn-primary" disabled={pending}>
         {pending ? "Guardando…" : "Actualizar tipo de cambio"}

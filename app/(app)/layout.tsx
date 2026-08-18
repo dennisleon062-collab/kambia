@@ -5,7 +5,7 @@ export default async function AppLayout({ children }: { children: React.ReactNod
   const usuario = await getUsuarioActual();
 
   return (
-    <div className="min-h-dvh pb-20">
+    <div className="min-h-dvh bg-paper pb-24">
       {children}
       <BottomNav rol={usuario.rol} />
     </div>

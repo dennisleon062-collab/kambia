@@ -16,7 +16,7 @@ export default async function BitacoraJuanPage() {
       <OfflineQueueStatus />
       <main className="flex flex-col gap-4 p-4">
         {!fondoHoy && (
-          <div className="card text-sm text-neutral-600">
+          <div className="card text-sm text-ink/60">
             Milagro aún no te ha entregado el fondo de hoy.
           </div>
         )}
@@ -24,29 +24,29 @@ export default async function BitacoraJuanPage() {
         {fondoHoy && (
           <>
             <div className="card flex items-center justify-between text-sm">
-              <span className="text-neutral-500">Fondo de hoy</span>
+              <span className="text-ink/50">Fondo de hoy</span>
               <span className="font-mono font-semibold">S/ {fondoHoy.monto_entregado}</span>
             </div>
 
             <BitacoraJuanForm fondoDiarioId={fondoHoy.id} />
 
             <section className="flex flex-col gap-2">
-              <h2 className="text-sm font-semibold uppercase tracking-wide text-neutral-500">
+              <h2 className="text-sm font-semibold uppercase tracking-wide text-ink/50">
                 Operaciones de hoy
               </h2>
-              <div className="card divide-y divide-neutral-100">
+              <div className="card divide-y divide-ink/10">
                 {operaciones.length === 0 && (
-                  <p className="py-2 text-sm text-neutral-500">Sin operaciones registradas aún.</p>
+                  <p className="py-2 text-sm text-ink/50">Sin operaciones registradas aún.</p>
                 )}
                 {operaciones.map((op) => (
                   <div key={op.id} className="py-2 text-sm first:pt-0 last:pb-0">
                     <div className="flex justify-between">
                       <span className="font-medium">{op.tipo_operacion}</span>
-                      <span className="text-neutral-500">{formatFechaHora(op.hora)}</span>
+                      <span className="text-ink/50">{formatFechaHora(op.hora)}</span>
                     </div>
-                    {op.cliente_texto && <p className="text-neutral-600">{op.cliente_texto}</p>}
-                    <p className="text-neutral-600">
-                      {op.monto_origen ?? "—"} {op.moneda_origen ?? ""} → {op.monto_destino ?? "—"}{" "}
+                    {op.cliente_texto && <p className="text-ink/60">{op.cliente_texto}</p>}
+                    <p className="text-ink/60">
+                      {op.monto_origen ?? "sin dato"} {op.moneda_origen ?? ""} → {op.monto_destino ?? "sin dato"}{" "}
                       {op.moneda_destino ?? ""}
                     </p>
                   </div>

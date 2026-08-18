@@ -15,16 +15,16 @@ export default async function CierrePage() {
 
   return (
     <>
-      <Header nombre={usuario.nombre} titulo={`Cierre diario — ${hoy}`} />
+      <Header nombre={usuario.nombre} titulo={`Cierre diario · ${hoy}`} />
       <main className="flex flex-col gap-4 p-4">
         <CierreForm cuentas={cuentas} />
 
         {cierresHoy.length > 0 && (
           <section className="flex flex-col gap-2">
-            <h2 className="text-sm font-semibold uppercase tracking-wide text-neutral-500">
+            <h2 className="text-sm font-semibold uppercase tracking-wide text-ink/50">
               Cierres confirmados hoy
             </h2>
-            <div className="card divide-y divide-neutral-100">
+            <div className="card divide-y divide-ink/10">
               {cierresHoy.map((c) => (
                 <div key={c.id} className="py-2 text-sm first:pt-0 last:pb-0">
                   <div className="flex justify-between">
@@ -35,18 +35,18 @@ export default async function CierrePage() {
                       {c.estado}
                     </span>
                   </div>
-                  <p className="text-neutral-600">
+                  <p className="text-ink/60">
                     Faltante/sobrante real:{" "}
                     {c.diferencia_real !== null
                       ? formatMonto(
                           c.diferencia_real,
                           (c as unknown as { cuentas: { moneda_codigo: string } }).cuentas.moneda_codigo
                         )
-                      : "—"}
+                      : "sin dato"}
                     {" · "}Variación cambiaria:{" "}
                     {c.variacion_cambiaria !== null
                       ? formatMonto(c.variacion_cambiaria, "PEN")
-                      : "—"}
+                      : "sin dato"}
                   </p>
                 </div>
               ))}
