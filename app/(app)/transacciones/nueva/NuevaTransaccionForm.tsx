@@ -53,7 +53,7 @@ export function NuevaTransaccionForm({
     [cuentas]
   );
   const cuentaMonedas = useMemo(() => cuentas.find((c) => c.slug === "boveda_monedas"), [cuentas]);
-  const cuentaBilletes = useMemo(() => cuentas.find((c) => c.slug === "boveda_billetes"), [cuentas]);
+  const cuentaEfectivoPen = useMemo(() => cuentas.find((c) => c.slug === "boveda_efectivo_pen"), [cuentas]);
   const [subtipoMonedas, setSubtipoMonedas] = useState<"monedas" | "billetes">("monedas");
   const cuentasBanco = useMemo(() => cuentas.filter((c) => c.tipo === "banco"), [cuentas]);
 
@@ -396,7 +396,7 @@ export function NuevaTransaccionForm({
               <input
                 type="hidden"
                 name="cuenta_destino_id"
-                value={(subtipoMonedas === "monedas" ? cuentaMonedas : cuentaBilletes)?.id ?? ""}
+                value={(subtipoMonedas === "monedas" ? cuentaMonedas : cuentaEfectivoPen)?.id ?? ""}
               />
               <CampoMonto name="monto_nominal" label="Monto nominal cambiado (S/)" />
             </>

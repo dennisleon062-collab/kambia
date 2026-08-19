@@ -62,7 +62,6 @@ insert into cuentas (nombre, slug, tipo, moneda_codigo) values
   ('Bóveda Efectivo Dólares', 'boveda_efectivo_usd', 'efectivo_boveda', 'USD'),
   ('Bóveda Efectivo Euros',   'boveda_efectivo_eur', 'efectivo_boveda', 'EUR'),
   ('Bóveda Monedas',          'boveda_monedas',      'efectivo_boveda', 'MONEDAS'),
-  ('Bóveda Billetes',         'boveda_billetes',     'efectivo_boveda', 'MONEDAS'),
   ('Fondo de Juan',           'fondo_juan_pen',      'fondo_juan',      'PEN');
 
 -- ----------------------------------------------------------------------------
@@ -342,7 +341,8 @@ left join (
   from movimientos
   where cuenta_origen_id is not null
   group by cuenta_origen_id
-) salidas on salidas.cuenta_id = c.id;
+) salidas on salidas.cuenta_id = c.id
+where c.activa = true;
 
 -- Saldo pendiente de cuentas por cobrar = monto_original - SUM(abonos)
 create or replace view v_cuentas_por_cobrar_saldo

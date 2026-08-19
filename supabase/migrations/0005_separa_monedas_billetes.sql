@@ -7,5 +7,5 @@
 update cuentas set nombre = 'Bóveda Monedas' where slug = 'boveda_monedas';
 
 insert into cuentas (nombre, slug, tipo, moneda_codigo)
-values ('Bóveda Billetes', 'boveda_billetes', 'efectivo_boveda', 'MONEDAS')
+values ('Bóveda Billetes', 'boveda_billetes', 'efectivo_boveda', 'PEN')
 on conflict (slug) do nothing;
