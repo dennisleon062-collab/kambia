@@ -284,39 +284,37 @@ export function NuevaTransaccionForm({
 
             <div className="h-px bg-[#f0f0ea]" />
 
-            <div className="flex items-end justify-between gap-3">
-              <div className="min-w-0 flex-1">
-                <p className="text-[12.5px] text-ink/50">
-                  Recibo {modo === "compra_divisa" ? monedaDivisa : "soles"}
-                </p>
-                <div className="mt-1 flex items-baseline gap-1.5">
-                  <span className="font-num text-[15px] text-ink/50">
-                    {modo === "compra_divisa" ? (monedaDivisa === "USD" ? "US$" : "€") : "S/"}
-                  </span>
-                  <input
-                    type="number"
-                    step="0.01"
-                    inputMode="decimal"
-                    placeholder="0"
-                    className="font-num w-full border-none bg-transparent text-[26px] font-semibold outline-none"
-                    value={montoDestino}
-                    onChange={(e) => handleMontoDestinoChange(e.target.value)}
-                  />
-                </div>
-              </div>
-              <button
-                type="button"
-                onClick={() => setMostrarCuentas((v) => !v)}
-                className="shrink-0 text-right text-[11.5px] text-lime-dark"
-              >
-                <span className="block text-ink/50">de / a</span>
-                <span className="mt-0.5 block text-[13px] font-semibold text-ink">
-                  {(cuentas.find((c) => c.id === origenFinalId)?.nombre ?? "…").split(" - ")[0]} →{" "}
-                  {(cuentas.find((c) => c.id === destinoFinalId)?.nombre ?? "…").split(" - ")[0]}
+            <div>
+              <p className="text-[12.5px] text-ink/50">
+                Recibo {modo === "compra_divisa" ? monedaDivisa : "soles"}
+              </p>
+              <div className="mt-1 flex items-baseline gap-1.5">
+                <span className="font-num text-[15px] text-ink/50">
+                  {modo === "compra_divisa" ? (monedaDivisa === "USD" ? "US$" : "€") : "S/"}
                 </span>
-                cambiar cuentas
-              </button>
+                <input
+                  type="number"
+                  step="0.01"
+                  inputMode="decimal"
+                  placeholder="0"
+                  className="font-num w-full border-none bg-transparent text-[26px] font-semibold outline-none"
+                  value={montoDestino}
+                  onChange={(e) => handleMontoDestinoChange(e.target.value)}
+                />
+              </div>
             </div>
+
+            <button
+              type="button"
+              onClick={() => setMostrarCuentas((v) => !v)}
+              className="flex items-center justify-between gap-2 rounded-xl bg-paper px-3 py-2.5 text-left"
+            >
+              <span className="min-w-0 flex-1 truncate text-[12.5px] font-medium text-ink/70">
+                {cuentas.find((c) => c.id === origenFinalId)?.nombre ?? "…"} →{" "}
+                {cuentas.find((c) => c.id === destinoFinalId)?.nombre ?? "…"}
+              </span>
+              <span className="shrink-0 text-[11.5px] font-semibold text-lime-dark">cambiar</span>
+            </button>
           </div>
 
           {mostrarCuentas && (
