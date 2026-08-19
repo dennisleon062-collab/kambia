@@ -65,10 +65,9 @@ export default async function DashboardPage() {
     monedasPendientes.size <= 1 ? depositos.reduce((acc, d) => acc + (d.monto_destino ?? 0), 0) : null;
   const monedaPendiente = depositos[0]?.moneda_destino ?? "PEN";
 
-  const deudasPorMoneda = new Map<string, number>();
-  for (const c of cxcAbiertas) {
-    deudasPorMoneda.set(c.moneda, (deudasPorMoneda.get(c.moneda) ?? 0) + c.saldo_pendiente);
-  }
+  const deudaTotalSoles = Math.round(
+    cxcAbiertas.reduce((acc, c) => acc + convertirASoles(c.saldo_pendiente, c.moneda, tc), 0) * 100
+  ) / 100;
 
   return (
     <>
@@ -127,11 +126,7 @@ export default async function DashboardPage() {
               <p className="text-[13.5px] font-semibold leading-tight">
                 {cxcAbiertas.length} {cxcAbiertas.length === 1 ? "cliente te debe" : "clientes te deben"}
               </p>
-              <p className="truncate text-[12.5px] text-ink/50">
-                {Array.from(deudasPorMoneda.entries())
-                  .map(([moneda, total]) => formatMonto(total, moneda))
-                  .join(" · ")}
-              </p>
+              <p className="text-[12.5px] text-ink/50">{formatMonto(deudaTotalSoles, "PEN")} en total</p>
             </div>
             <span className="shrink-0 text-[13px] font-semibold text-lime-dark">Ver</span>
           </Link>
