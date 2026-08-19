@@ -15,6 +15,7 @@ export type MovimientoTipo =
   | "pago_deuda_cliente"
   | "prestamo_a_cliente"
   | "deposito_sin_identificar"
+  | "gasto"
   | "ajuste_correccion"
   | "saldo_inicial";
 
@@ -135,6 +136,16 @@ export interface CierreDiario {
   estado: CierreEstado;
   observacion: string | null;
   cerrado: boolean;
+  usuario_id: string;
+  creado_en: string;
+}
+
+export interface ResumenDiario {
+  id: string;
+  fecha: string;
+  ganancia: number;
+  total_soles: number;
+  comentario: string | null;
   usuario_id: string;
   creado_en: string;
 }

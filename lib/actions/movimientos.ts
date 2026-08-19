@@ -49,6 +49,9 @@ export async function registrarMovimiento(formData: FormData): Promise<Resultado
       case "deposito_sin_identificar":
         return await registrarDepositoSinIdentificar(formData);
 
+      case "gasto":
+        return await registrarGasto(formData);
+
       case "ajuste_correccion":
         return await registrarAjuste(formData);
 
@@ -253,6 +256,29 @@ export async function registrarMovimiento(formData: FormData): Promise<Resultado
       moneda_destino: cDestino.moneda_codigo,
       monto_destino: monto,
       estado: "pendiente_identificar",
+      comentario,
+    });
+
+    return finalizar(error);
+  }
+
+  async function registrarGasto(fd: FormData): Promise<Resultado> {
+    const cuentaOrigenId = str(fd, "cuenta_origen_id");
+    const monto = num(fd, "monto_origen");
+
+    if (!cuentaOrigenId) return { error: "Seleccione de dónde sale el gasto" };
+    if (!monto || monto <= 0) return { error: "Ingrese un monto válido" };
+    if (!comentario) return { error: "Describa el gasto" };
+
+    const { data: cOrigen } = await supabase.from("cuentas").select("*").eq("id", cuentaOrigenId).single();
+    if (!cOrigen) return { error: "Cuenta no encontrada" };
+
+    const { error } = await supabase.from("movimientos").insert({
+      tipo: "gasto",
+      usuario_id: usuario.id,
+      cuenta_origen_id: cuentaOrigenId,
+      moneda_origen: cOrigen.moneda_codigo,
+      monto_origen: monto,
       comentario,
     });
 

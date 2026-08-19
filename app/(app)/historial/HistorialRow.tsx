@@ -16,6 +16,7 @@ const ETIQUETAS: Record<string, string> = {
   pago_deuda_cliente: "Pago de deuda",
   prestamo_a_cliente: "Préstamo a cliente",
   deposito_sin_identificar: "Depósito sin identificar",
+  gasto: "Gasto",
   ajuste_correccion: "Ajuste / anulación",
   saldo_inicial: "Saldo inicial",
 };

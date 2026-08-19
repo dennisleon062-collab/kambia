@@ -1,3 +1,23 @@
+import type { SaldoCuenta } from "@/types/database.types";
+
+export function convertirASoles(
+  monto: number,
+  moneda: string,
+  tc: { tc_usd: number; tc_eur: number } | null
+): number {
+  if (moneda === "USD" && tc) return monto * tc.tc_usd;
+  if (moneda === "EUR" && tc) return monto * tc.tc_eur;
+  return monto;
+}
+
+export function calcularTotalEnSoles(
+  saldos: SaldoCuenta[],
+  tc: { tc_usd: number; tc_eur: number } | null
+): number {
+  const total = saldos.reduce((acc, s) => acc + convertirASoles(s.saldo, s.moneda_codigo, tc), 0);
+  return Math.round(total * 100) / 100;
+}
+
 const SIMBOLOS: Record<string, string> = {
   PEN: "S/",
   USD: "US$",

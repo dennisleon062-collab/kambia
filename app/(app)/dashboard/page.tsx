@@ -2,11 +2,20 @@ import { getUsuarioActual } from "@/lib/auth";
 import { getSaldos } from "@/lib/queries/saldos";
 import { getTipoCambioVigente } from "@/lib/queries/tipo-cambio";
 import { getDepositosPendientes } from "@/lib/queries/depositos";
+import { getCuentasPorCobrarAbiertas } from "@/lib/queries/cxc";
+import { getResumenDeFecha, getGastosDeFecha } from "@/lib/queries/resumen-diario";
 import { RealtimeRefresher } from "@/components/RealtimeRefresher";
 import { LogoutButton } from "@/components/LogoutButton";
-import { formatMonto } from "@/lib/format";
+import { CuadreDelDia } from "./CuadreDelDia";
+import { calcularTotalEnSoles, convertirASoles, formatMonto } from "@/lib/format";
 import Link from "next/link";
 import type { SaldoCuenta } from "@/types/database.types";
+
+function fechaAyer(hoy: string): string {
+  const d = new Date(`${hoy}T00:00:00.000Z`);
+  d.setUTCDate(d.getUTCDate() - 1);
+  return d.toISOString().slice(0, 10);
+}
 
 const TITULOS_TIPO: Record<string, string> = {
   banco: "Bancos",
@@ -34,23 +43,32 @@ function iconoCuenta(slug: string) {
 }
 
 export default async function DashboardPage() {
-  const [usuario, saldos, tc, depositos] = await Promise.all([
+  const hoy = new Date().toISOString().slice(0, 10);
+  const ayer = fechaAyer(hoy);
+
+  const [usuario, saldos, tc, depositos, cxcAbiertas, resumenAyer, resumenHoy, gastosHoy] = await Promise.all([
     getUsuarioActual(),
     getSaldos(),
     getTipoCambioVigente(),
     getDepositosPendientes(),
+    getCuentasPorCobrarAbiertas(),
+    getResumenDeFecha(ayer),
+    getResumenDeFecha(hoy),
+    getGastosDeFecha(hoy),
   ]);
 
   const grupos = agruparPorTipo(saldos);
-  const totalEnSoles = saldos.reduce((acc, s) => {
-    if (s.moneda_codigo === "USD" && tc) return acc + s.saldo * tc.tc_usd;
-    if (s.moneda_codigo === "EUR" && tc) return acc + s.saldo * tc.tc_eur;
-    return acc + s.saldo;
-  }, 0);
+  const totalEnSoles = calcularTotalEnSoles(saldos, tc);
+  const gastosHoyEnSoles = gastosHoy.reduce((acc, g) => acc + convertirASoles(g.monto, g.moneda, tc), 0);
   const monedasPendientes = new Set(depositos.map((d) => d.moneda_destino));
   const totalPendiente =
     monedasPendientes.size <= 1 ? depositos.reduce((acc, d) => acc + (d.monto_destino ?? 0), 0) : null;
   const monedaPendiente = depositos[0]?.moneda_destino ?? "PEN";
+
+  const deudasPorMoneda = new Map<string, number>();
+  for (const c of cxcAbiertas) {
+    deudasPorMoneda.set(c.moneda, (deudasPorMoneda.get(c.moneda) ?? 0) + c.saldo_pendiente);
+  }
 
   return (
     <>
@@ -93,6 +111,32 @@ export default async function DashboardPage() {
       </div>
 
       <main className="flex flex-col gap-3.5 px-4 pt-4">
+        <CuadreDelDia
+          ayer={resumenAyer}
+          gastosHoy={gastosHoyEnSoles}
+          hoyTotal={totalEnSoles}
+          resumenHoy={resumenHoy}
+        />
+
+        {cxcAbiertas.length > 0 && (
+          <Link href="/deudas" className="card flex items-center gap-3">
+            <span className="flex h-[26px] w-[26px] shrink-0 items-center justify-center rounded-full bg-[#eef2e2] text-sm font-bold text-[#4b6b1f]">
+              $
+            </span>
+            <div className="min-w-0 flex-1">
+              <p className="text-[13.5px] font-semibold leading-tight">
+                {cxcAbiertas.length} {cxcAbiertas.length === 1 ? "cliente te debe" : "clientes te deben"}
+              </p>
+              <p className="truncate text-[12.5px] text-ink/50">
+                {Array.from(deudasPorMoneda.entries())
+                  .map(([moneda, total]) => formatMonto(total, moneda))
+                  .join(" · ")}
+              </p>
+            </div>
+            <span className="shrink-0 text-[13px] font-semibold text-lime-dark">Ver</span>
+          </Link>
+        )}
+
         {Array.from(grupos.entries()).map(([tipo, cuentas]) => (
           <section key={tipo} className="rounded-2xl bg-white px-4 py-1 shadow-sm">
             <p className="border-b border-[#f0f0ea] py-2.5 text-[13px] font-semibold">
@@ -143,6 +187,7 @@ export default async function DashboardPage() {
         )}
 
         <div className="flex flex-wrap justify-center gap-x-4 gap-y-1 py-2 text-[12.5px] text-ink/40">
+          <Link href="/deudas">Quién te debe</Link>
           <Link href="/historial">Historial de hoy</Link>
           <Link href="/saldo-inicial">Cargar saldo inicial</Link>
           <Link href="/deuda-inicial">Cargar deudas iniciales</Link>

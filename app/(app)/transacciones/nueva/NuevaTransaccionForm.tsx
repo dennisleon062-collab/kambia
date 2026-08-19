@@ -15,6 +15,7 @@ const TIPOS_OTRO: { value: MovimientoTipo; label: string; pill: string }[] = [
   { value: "prestamo_a_cliente", label: "Préstamo a cliente", pill: "Préstamo" },
   { value: "deposito_sin_identificar", label: "Depósito sin identificar", pill: "Depósito" },
   { value: "cruce_divisas", label: "Cruce de divisas", pill: "Cruce" },
+  { value: "gasto", label: "Gasto / salida de dinero", pill: "Gasto" },
   { value: "ajuste_correccion", label: "Ajuste / corrección", pill: "Ajuste" },
 ];
 
@@ -399,6 +400,13 @@ export function NuevaTransaccionForm({
             </>
           )}
 
+          {tipoOtro === "gasto" && (
+            <>
+              <SelectCuentaNativo name="cuenta_origen_id" label="Cuenta de donde sale" opciones={cuentas} />
+              <CampoMonto name="monto_origen" label="Monto del gasto" />
+            </>
+          )}
+
           {tipoOtro === "ajuste_correccion" && (
             <>
               <div>
@@ -423,12 +431,16 @@ export function NuevaTransaccionForm({
 
           <div>
             <label className="field-label" htmlFor="comentario">
-              {tipoOtro === "ajuste_correccion" ? "Motivo del ajuste" : "Comentario (opcional)"}
+              {tipoOtro === "ajuste_correccion"
+                ? "Motivo del ajuste"
+                : tipoOtro === "gasto"
+                  ? "¿En qué se gastó?"
+                  : "Comentario (opcional)"}
             </label>
             <input
               id="comentario"
               name="comentario"
-              required={tipoOtro === "ajuste_correccion"}
+              required={tipoOtro === "ajuste_correccion" || tipoOtro === "gasto"}
               className="field-input"
             />
           </div>
