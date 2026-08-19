@@ -407,6 +407,11 @@ create policy "movimientos_insert" on movimientos for insert to authenticated wi
 -- el trigger fn_bloquear_edicion_movimientos exige rol 'dueña' y deja log en movimientos_audit_log.
 create policy "movimientos_update_dueña" on movimientos for update to authenticated
   using (exists (select 1 from usuarios where id = auth.uid() and rol = 'dueña'));
+-- Borrado real solo para casos excepcionales (ej. limpiar datos de prueba al
+-- configurar el sistema); igual que el update, el trigger de inmutabilidad
+-- exige rol 'dueña' y deja log en movimientos_audit_log.
+create policy "movimientos_delete_dueña" on movimientos for delete to authenticated
+  using (exists (select 1 from usuarios where id = auth.uid() and rol = 'dueña'));
 
 create policy "cxc_select" on cuentas_por_cobrar for select to authenticated using (true);
 create policy "cxc_insert" on cuentas_por_cobrar for insert to authenticated with check (true);
