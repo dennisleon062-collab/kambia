@@ -7,7 +7,7 @@ import { getResumenDeFecha, getGastosDeFecha } from "@/lib/queries/resumen-diari
 import { RealtimeRefresher } from "@/components/RealtimeRefresher";
 import { LogoutButton } from "@/components/LogoutButton";
 import { CuadreDelDia } from "./CuadreDelDia";
-import { calcularTotalEnSoles, convertirASoles, formatMonto } from "@/lib/format";
+import { calcularTotalConDeudas, convertirASoles, formatMonto } from "@/lib/format";
 import Link from "next/link";
 import type { SaldoCuenta } from "@/types/database.types";
 
@@ -58,16 +58,18 @@ export default async function DashboardPage() {
   ]);
 
   const grupos = agruparPorTipo(saldos);
-  const totalEnSoles = calcularTotalEnSoles(saldos, tc);
+  // Total "de la hoja de cuenta": cuentas reales + lo que le deben los clientes,
+  // igual que Milagro lo suma a mano en su cuaderno.
+  const totalEnSoles = calcularTotalConDeudas(saldos, cxcAbiertas, tc);
   const gastosHoyEnSoles = gastosHoy.reduce((acc, g) => acc + convertirASoles(g.monto, g.moneda, tc), 0);
   const monedasPendientes = new Set(depositos.map((d) => d.moneda_destino));
   const totalPendiente =
     monedasPendientes.size <= 1 ? depositos.reduce((acc, d) => acc + (d.monto_destino ?? 0), 0) : null;
   const monedaPendiente = depositos[0]?.moneda_destino ?? "PEN";
 
-  const deudaTotalSoles = Math.round(
-    cxcAbiertas.reduce((acc, c) => acc + convertirASoles(c.saldo_pendiente, c.moneda, tc), 0) * 100
-  ) / 100;
+  const deudaTotalSoles =
+    Math.round(cxcAbiertas.reduce((acc, c) => acc + convertirASoles(c.saldo_pendiente, c.moneda, tc), 0) * 100) /
+    100;
 
   return (
     <>
@@ -78,7 +80,7 @@ export default async function DashboardPage() {
           <span className="text-xs uppercase tracking-[.14em] text-paper/55">{usuario.nombre}</span>
           <LogoutButton />
         </div>
-        <p className="mt-4 text-[13px] text-paper/60">Todo el dinero, en soles</p>
+        <p className="mt-4 text-[13px] text-paper/60">Todo, en soles (cuentas + lo que te deben)</p>
         <div className="flex items-baseline gap-2">
           <span className="font-num text-[38px] font-semibold tracking-tight">
             {Math.trunc(totalEnSoles).toLocaleString("es-PE")}
@@ -117,21 +119,6 @@ export default async function DashboardPage() {
           resumenHoy={resumenHoy}
         />
 
-        {cxcAbiertas.length > 0 && (
-          <Link href="/deudas" className="card flex items-center gap-3">
-            <span className="flex h-[26px] w-[26px] shrink-0 items-center justify-center rounded-full bg-[#eef2e2] text-sm font-bold text-[#4b6b1f]">
-              $
-            </span>
-            <div className="min-w-0 flex-1">
-              <p className="text-[13.5px] font-semibold leading-tight">
-                {cxcAbiertas.length} {cxcAbiertas.length === 1 ? "cliente te debe" : "clientes te deben"}
-              </p>
-              <p className="text-[12.5px] text-ink/50">{formatMonto(deudaTotalSoles, "PEN")} en total</p>
-            </div>
-            <span className="shrink-0 text-[13px] font-semibold text-lime-dark">Ver</span>
-          </Link>
-        )}
-
         {Array.from(grupos.entries()).map(([tipo, cuentas]) => (
           <section key={tipo} className="rounded-2xl bg-white px-4 py-1 shadow-sm">
             <p className="border-b border-[#f0f0ea] py-2.5 text-[13px] font-semibold">
@@ -160,6 +147,33 @@ export default async function DashboardPage() {
             </div>
           </section>
         ))}
+
+        {cxcAbiertas.length > 0 && (
+          <section className="rounded-2xl bg-white px-4 py-1 shadow-sm">
+            <Link href="/deudas" className="flex items-center justify-between border-b border-[#f0f0ea] py-2.5">
+              <p className="text-[13px] font-semibold">Por cobrar (deudas)</p>
+              <span className="font-num text-[13px] text-ink/50">{formatMonto(deudaTotalSoles, "PEN")}</span>
+            </Link>
+            <div className="divide-y divide-[#f0f0ea]">
+              {cxcAbiertas.map((c) => (
+                <div key={c.id} className="flex items-center justify-between gap-3 py-3">
+                  <div className="flex min-w-0 items-center gap-2.5">
+                    <span
+                      className="flex h-[30px] w-[30px] shrink-0 items-center justify-center rounded-[9px] text-[11px] font-semibold"
+                      style={{ background: "#f5e9e4", color: "#9c4a2f" }}
+                    >
+                      D
+                    </span>
+                    <p className="truncate text-[15px] font-semibold">{c.cliente_texto}</p>
+                  </div>
+                  <span className="font-num shrink-0 text-[17px] font-semibold">
+                    {formatMonto(c.saldo_pendiente, c.moneda)}
+                  </span>
+                </div>
+              ))}
+            </div>
+          </section>
+        )}
 
         {depositos.length > 0 && (
           <Link href="/depositos" className="flex items-center gap-3 rounded-2xl bg-amber-bg px-3.5 py-3.5">

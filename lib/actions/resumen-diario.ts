@@ -5,7 +5,8 @@ import { createClient } from "@/lib/supabase/server";
 import { getUsuarioActual } from "@/lib/auth";
 import { getSaldos } from "@/lib/queries/saldos";
 import { getTipoCambioVigente } from "@/lib/queries/tipo-cambio";
-import { calcularTotalEnSoles } from "@/lib/format";
+import { getCuentasPorCobrarAbiertas } from "@/lib/queries/cxc";
+import { calcularTotalConDeudas } from "@/lib/format";
 
 type Resultado = { error: string | null };
 
@@ -21,8 +22,12 @@ export async function registrarGananciaDelDia(formData: FormData): Promise<Resul
   const supabase = await createClient();
   const hoy = new Date().toISOString().slice(0, 10);
 
-  const [saldos, tc] = await Promise.all([getSaldos(), getTipoCambioVigente()]);
-  const totalSoles = calcularTotalEnSoles(saldos, tc);
+  const [saldos, tc, cxcAbiertas] = await Promise.all([
+    getSaldos(),
+    getTipoCambioVigente(),
+    getCuentasPorCobrarAbiertas(),
+  ]);
+  const totalSoles = calcularTotalConDeudas(saldos, cxcAbiertas, tc);
 
   const { error } = await supabase.from("resumen_diario").upsert(
     {
