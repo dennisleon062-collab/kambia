@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { getUsuarioActual } from "@/lib/auth";
 import { getFondoDeHoy, getBitacoraJuan } from "@/lib/queries/fondo-juan";
 import { Header } from "@/components/Header";
@@ -55,6 +56,12 @@ export default async function BitacoraJuanPage() {
             </section>
           </>
         )}
+
+        <div className="flex justify-center py-2">
+          <Link href="/historial" className="text-[12.5px] text-ink/40">
+            Ver todas las operaciones de hoy (para corregir alguna)
+          </Link>
+        </div>
       </main>
     </>
   );

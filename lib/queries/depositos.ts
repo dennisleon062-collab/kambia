@@ -11,5 +11,17 @@ export async function getDepositosPendientes(): Promise<Movimiento[]> {
     .order("fecha_hora", { ascending: false });
 
   if (error) throw error;
-  return data as unknown as Movimiento[];
+  const depositos = data as unknown as Movimiento[];
+  if (depositos.length === 0) return depositos;
+
+  const { data: anulaciones } = await supabase
+    .from("movimientos")
+    .select("movimiento_corregido_id")
+    .in(
+      "movimiento_corregido_id",
+      depositos.map((d) => d.id)
+    );
+  const idsAnulados = new Set((anulaciones ?? []).map((a) => a.movimiento_corregido_id));
+
+  return depositos.filter((d) => !idsAnulados.has(d.id));
 }

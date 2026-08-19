@@ -15,7 +15,8 @@ export type MovimientoTipo =
   | "pago_deuda_cliente"
   | "prestamo_a_cliente"
   | "deposito_sin_identificar"
-  | "ajuste_correccion";
+  | "ajuste_correccion"
+  | "saldo_inicial";
 
 export type MovimientoEstado = "normal" | "pendiente_identificar" | "identificado";
 

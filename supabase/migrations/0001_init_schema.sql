@@ -61,7 +61,8 @@ insert into cuentas (nombre, slug, tipo, moneda_codigo) values
   ('Bóveda Efectivo Soles',   'boveda_efectivo_pen', 'efectivo_boveda', 'PEN'),
   ('Bóveda Efectivo Dólares', 'boveda_efectivo_usd', 'efectivo_boveda', 'USD'),
   ('Bóveda Efectivo Euros',   'boveda_efectivo_eur', 'efectivo_boveda', 'EUR'),
-  ('Bóveda Monedas/Billetes', 'boveda_monedas',      'efectivo_boveda', 'MONEDAS'),
+  ('Bóveda Monedas',          'boveda_monedas',      'efectivo_boveda', 'MONEDAS'),
+  ('Bóveda Billetes',         'boveda_billetes',     'efectivo_boveda', 'MONEDAS'),
   ('Fondo de Juan',           'fondo_juan_pen',      'fondo_juan',      'PEN');
 
 -- ----------------------------------------------------------------------------
@@ -119,7 +120,7 @@ create table movimientos (
     'traspaso_banco_efectivo', 'traspaso_interno',
     'venta_monedas_billetes', 'pago_deuda_cliente',
     'prestamo_a_cliente', 'deposito_sin_identificar',
-    'ajuste_correccion'
+    'ajuste_correccion', 'saldo_inicial'
   )),
   cliente_texto text,
 

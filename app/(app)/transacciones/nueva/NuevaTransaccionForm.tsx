@@ -53,6 +53,8 @@ export function NuevaTransaccionForm({
     [cuentas]
   );
   const cuentaMonedas = useMemo(() => cuentas.find((c) => c.slug === "boveda_monedas"), [cuentas]);
+  const cuentaBilletes = useMemo(() => cuentas.find((c) => c.slug === "boveda_billetes"), [cuentas]);
+  const [subtipoMonedas, setSubtipoMonedas] = useState<"monedas" | "billetes">("monedas");
   const cuentasBanco = useMemo(() => cuentas.filter((c) => c.tipo === "banco"), [cuentas]);
 
   const bovedaPen = useMemo(() => cuentas.find((c) => c.slug === "boveda_efectivo_pen"), [cuentas]);
@@ -374,7 +376,14 @@ export function NuevaTransaccionForm({
                 <label className="field-label" htmlFor="subtipo">
                   Tipo
                 </label>
-                <select id="subtipo" name="subtipo" required className="field-input">
+                <select
+                  id="subtipo"
+                  name="subtipo"
+                  required
+                  className="field-input"
+                  value={subtipoMonedas}
+                  onChange={(e) => setSubtipoMonedas(e.target.value as "monedas" | "billetes")}
+                >
                   <option value="monedas">Monedas (S/2 por cada S/100)</option>
                   <option value="billetes">Billetes (S/1 por cada S/100)</option>
                 </select>
@@ -384,7 +393,11 @@ export function NuevaTransaccionForm({
                 label="Cuenta de donde sale el efectivo normal"
                 opciones={cuentasPen}
               />
-              <input type="hidden" name="cuenta_destino_id" value={cuentaMonedas?.id ?? ""} />
+              <input
+                type="hidden"
+                name="cuenta_destino_id"
+                value={(subtipoMonedas === "monedas" ? cuentaMonedas : cuentaBilletes)?.id ?? ""}
+              />
               <CampoMonto name="monto_nominal" label="Monto nominal cambiado (S/)" />
             </>
           )}

@@ -54,6 +54,60 @@ export async function entregarFondo(formData: FormData): Promise<Resultado> {
   return { error: null };
 }
 
+export async function corregirMontoEntregado(formData: FormData): Promise<Resultado> {
+  const fondoId = String(formData.get("fondo_diario_id"));
+  const nuevoMonto = Number(formData.get("monto_entregado"));
+  if (!fondoId) return { error: "Fondo no encontrado" };
+  if (!nuevoMonto || nuevoMonto <= 0) return { error: "Ingrese un monto válido" };
+
+  const usuario = await getUsuarioActual();
+  if (usuario.rol !== "dueña") return { error: "Solo la dueña puede corregir el monto entregado" };
+
+  const supabase = await createClient();
+  const { data: fondo } = await supabase.from("fondo_diario").select("*").eq("id", fondoId).single();
+  if (!fondo) return { error: "Fondo no encontrado" };
+  if (fondo.estado !== "pendiente_devolucion") {
+    return { error: "Ya se registró la devolución de este fondo, no se puede corregir la entrega" };
+  }
+
+  const delta = Math.round((nuevoMonto - Number(fondo.monto_entregado)) * 100) / 100;
+  if (delta === 0) return { error: null };
+
+  const [{ data: boveda }, { data: fondoJuan }] = await Promise.all([
+    supabase.from("cuentas").select("*").eq("slug", "boveda_efectivo_pen").single(),
+    supabase.from("cuentas").select("*").eq("slug", "fondo_juan_pen").single(),
+  ]);
+  if (!boveda || !fondoJuan) return { error: "Cuentas de bóveda/fondo no encontradas" };
+
+  const origen = delta > 0 ? boveda : fondoJuan;
+  const destino = delta > 0 ? fondoJuan : boveda;
+
+  const { error: errorMov } = await supabase.from("movimientos").insert({
+    tipo: "traspaso_interno",
+    usuario_id: usuario.id,
+    cuenta_origen_id: origen.id,
+    moneda_origen: origen.moneda_codigo,
+    monto_origen: Math.abs(delta),
+    cuenta_destino_id: destino.id,
+    moneda_destino: destino.moneda_codigo,
+    monto_destino: Math.abs(delta),
+    comentario: `Corrección del fondo entregado: de S/ ${fondo.monto_entregado} a S/ ${nuevoMonto}`,
+  });
+  if (errorMov) return { error: errorMov.message };
+
+  const { error: errorUpdate } = await supabase
+    .from("fondo_diario")
+    .update({ monto_entregado: nuevoMonto })
+    .eq("id", fondoId);
+  if (errorUpdate) return { error: errorUpdate.message };
+
+  revalidatePath("/fondo-juan");
+  revalidatePath("/bitacora-juan");
+  revalidatePath("/dashboard");
+  revalidatePath("/historial");
+  return { error: null };
+}
+
 export async function devolverFondo(formData: FormData): Promise<Resultado> {
   const fondoId = String(formData.get("fondo_diario_id"));
   const monto = Number(formData.get("monto_devuelto"));

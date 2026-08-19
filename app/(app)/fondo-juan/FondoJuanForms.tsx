@@ -2,7 +2,7 @@
 
 import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
-import { entregarFondo, devolverFondo, marcarAsumidoPorJuan } from "@/lib/actions/fondo-juan";
+import { entregarFondo, devolverFondo, marcarAsumidoPorJuan, corregirMontoEntregado } from "@/lib/actions/fondo-juan";
 import type { FondoDiario } from "@/types/database.types";
 
 function useAccion(accion: (fd: FormData) => Promise<{ error: string | null }>) {
@@ -62,15 +62,62 @@ export function EntregarFondoForm() {
 export function DevolverFondoForm({ fondo }: { fondo: FondoDiario }) {
   const { ejecutar, error, pending } = useAccion(devolverFondo);
   const asumido = useAccion(marcarAsumidoPorJuan);
+  const correccion = useAccion(corregirMontoEntregado);
+  const [corrigiendo, setCorrigiendo] = useState(false);
 
   return (
     <div className="card flex flex-col gap-3">
       <h2 className="font-semibold">Fondo de hoy</h2>
-      <p className="text-sm text-ink/60">
-        Entregado: <span className="font-mono font-semibold">S/ {fondo.monto_entregado}</span>
-      </p>
+      <div className="flex items-center justify-between">
+        <p className="text-sm text-ink/60">
+          Entregado: <span className="font-mono font-semibold">S/ {fondo.monto_entregado}</span>
+        </p>
+        {fondo.estado === "pendiente_devolucion" && !corrigiendo && (
+          <button type="button" className="text-xs font-semibold text-lime-dark" onClick={() => setCorrigiendo(true)}>
+            Corregir
+          </button>
+        )}
+      </div>
 
-      {fondo.estado === "pendiente_devolucion" && (
+      {corrigiendo && (
+        <form
+          className="flex flex-col gap-2 border-t border-ink/10 pt-3"
+          onSubmit={(e) => {
+            e.preventDefault();
+            const fd = new FormData(e.currentTarget);
+            fd.set("fondo_diario_id", fondo.id);
+            correccion.ejecutar(fd, () => setCorrigiendo(false));
+          }}
+        >
+          <label className="field-label" htmlFor="monto_entregado_corregido">
+            Monto correcto que se entregó (S/)
+          </label>
+          <input
+            id="monto_entregado_corregido"
+            name="monto_entregado"
+            type="number"
+            step="0.01"
+            inputMode="decimal"
+            required
+            defaultValue={fondo.monto_entregado}
+            className="field-input"
+          />
+          <p className="text-xs text-ink/40">
+            Se ajusta con un traspaso entre la bóveda y el fondo por la diferencia.
+          </p>
+          {correccion.error && <p className="text-sm text-rust">{correccion.error}</p>}
+          <div className="flex gap-2">
+            <button type="submit" className="btn-primary" disabled={correccion.pending}>
+              {correccion.pending ? "Guardando…" : "Guardar corrección"}
+            </button>
+            <button type="button" className="btn-secondary" onClick={() => setCorrigiendo(false)}>
+              Cancelar
+            </button>
+          </div>
+        </form>
+      )}
+
+      {fondo.estado === "pendiente_devolucion" && !corrigiendo && (
         <form
           className="flex flex-col gap-3"
           onSubmit={(e) => {

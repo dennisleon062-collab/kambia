@@ -25,7 +25,8 @@ function agruparPorTipo(saldos: SaldoCuenta[]) {
 }
 
 function iconoCuenta(slug: string) {
-  if (slug.startsWith("boveda_efectivo_pen") || slug === "boveda_monedas") return { txt: "S/", bg: "#eef2e2", color: "#4b6b1f" };
+  if (slug.startsWith("boveda_efectivo_pen") || slug === "boveda_monedas" || slug === "boveda_billetes")
+    return { txt: "S/", bg: "#eef2e2", color: "#4b6b1f" };
   if (slug.includes("usd")) return { txt: "US$", bg: "#eef2e2", color: "#4b6b1f" };
   if (slug.includes("eur")) return { txt: "€", bg: "#eef2e2", color: "#4b6b1f" };
   if (slug.startsWith("fondo_juan")) return { txt: "J", bg: "#f3ecdd", color: "#7a6327" };
@@ -140,6 +141,12 @@ export default async function DashboardPage() {
             <span className="ml-auto text-[13px] font-semibold text-amber-text">Ver</span>
           </Link>
         )}
+
+        <div className="flex flex-wrap justify-center gap-x-4 gap-y-1 py-2 text-[12.5px] text-ink/40">
+          <Link href="/historial">Historial de hoy</Link>
+          <Link href="/saldo-inicial">Cargar saldo inicial</Link>
+          <Link href="/deuda-inicial">Cargar deudas iniciales</Link>
+        </div>
       </main>
     </>
   );
