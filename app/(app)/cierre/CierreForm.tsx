@@ -52,35 +52,20 @@ export function CierreForm({ cuentas }: { cuentas: CuentaFisicaConSaldo[] }) {
               Sistema: {formatMonto(c.saldo, c.moneda_codigo)}
             </span>
           </div>
-          <div className="grid grid-cols-2 gap-2">
-            <div>
-              <label className="field-label" htmlFor={`conteo_milagro_${c.cuenta_id}`}>
-                Conteo Milagro
-              </label>
-              <input
-                id={`conteo_milagro_${c.cuenta_id}`}
-                name={`conteo_milagro_${c.cuenta_id}`}
-                type="number"
-                step="0.01"
-                inputMode="decimal"
-                required
-                className="field-input"
-                onChange={(e) => actualizarPreview(c.cuenta_id, c.saldo, e.target.value)}
-              />
-            </div>
-            <div>
-              <label className="field-label" htmlFor={`conteo_juan_${c.cuenta_id}`}>
-                Conteo Juan
-              </label>
-              <input
-                id={`conteo_juan_${c.cuenta_id}`}
-                name={`conteo_juan_${c.cuenta_id}`}
-                type="number"
-                step="0.01"
-                inputMode="decimal"
-                className="field-input"
-              />
-            </div>
+          <div>
+            <label className="field-label" htmlFor={`conteo_milagro_${c.cuenta_id}`}>
+              Conteo
+            </label>
+            <input
+              id={`conteo_milagro_${c.cuenta_id}`}
+              name={`conteo_milagro_${c.cuenta_id}`}
+              type="number"
+              step="0.01"
+              inputMode="decimal"
+              required
+              className="field-input"
+              onChange={(e) => actualizarPreview(c.cuenta_id, c.saldo, e.target.value)}
+            />
           </div>
           {preview[c.cuenta_id] !== undefined && preview[c.cuenta_id] !== null && (
             <p className={`text-sm ${preview[c.cuenta_id] === 0 ? "text-brand-700" : "text-amber-700"}`}>

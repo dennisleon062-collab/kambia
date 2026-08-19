@@ -1,5 +1,5 @@
 import { createClient } from "@/lib/supabase/server";
-import type { FondoDiario, MovimientoJuan } from "@/types/database.types";
+import type { FondoDiario } from "@/types/database.types";
 
 export async function getFondoDeHoy(usuarioId: string): Promise<FondoDiario | null> {
   const supabase = await createClient();
@@ -26,16 +26,4 @@ export async function getHistorialFondo(limit = 15): Promise<FondoDiario[]> {
 
   if (error) throw error;
   return data as unknown as FondoDiario[];
-}
-
-export async function getBitacoraJuan(fondoDiarioId: string): Promise<MovimientoJuan[]> {
-  const supabase = await createClient();
-  const { data, error } = await supabase
-    .from("movimientos_juan")
-    .select("*")
-    .eq("fondo_diario_id", fondoDiarioId)
-    .order("hora", { ascending: false });
-
-  if (error) throw error;
-  return data as MovimientoJuan[];
 }

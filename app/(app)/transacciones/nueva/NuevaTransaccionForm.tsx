@@ -10,9 +10,7 @@ type ModoConversion = "compra_divisa" | "venta_divisa";
 type MonedaDivisa = "USD" | "EUR";
 
 const TIPOS_OTRO: { value: MovimientoTipo; label: string; pill: string }[] = [
-  { value: "venta_monedas_billetes", label: "Cambio de monedas/billetes", pill: "Monedas/billetes" },
-  { value: "traspaso_interno", label: "Traspaso interno", pill: "Traspaso" },
-  { value: "traspaso_banco_efectivo", label: "Traspaso banco ↔ efectivo", pill: "Banco ↔ efectivo" },
+  { value: "traspaso_interno", label: "Traspaso entre cuentas propias", pill: "Traspaso" },
   { value: "pago_deuda_cliente", label: "Pago de deuda de cliente", pill: "Deuda" },
   { value: "prestamo_a_cliente", label: "Préstamo a cliente", pill: "Préstamo" },
   { value: "deposito_sin_identificar", label: "Depósito sin identificar", pill: "Depósito" },
@@ -52,9 +50,6 @@ export function NuevaTransaccionForm({
     () => cuentas.filter((c) => c.moneda_codigo === "USD" || c.moneda_codigo === "EUR"),
     [cuentas]
   );
-  const cuentaMonedas = useMemo(() => cuentas.find((c) => c.slug === "boveda_monedas"), [cuentas]);
-  const cuentaEfectivoPen = useMemo(() => cuentas.find((c) => c.slug === "boveda_efectivo_pen"), [cuentas]);
-  const [subtipoMonedas, setSubtipoMonedas] = useState<"monedas" | "billetes">("monedas");
   const cuentasBanco = useMemo(() => cuentas.filter((c) => c.tipo === "banco"), [cuentas]);
 
   const bovedaPen = useMemo(() => cuentas.find((c) => c.slug === "boveda_efectivo_pen"), [cuentas]);
@@ -349,7 +344,7 @@ export function NuevaTransaccionForm({
         <>
           <input type="hidden" name="tipo" value={tipoOtro} />
 
-          {(tipoOtro === "traspaso_banco_efectivo" || tipoOtro === "traspaso_interno") && (
+          {tipoOtro === "traspaso_interno" && (
             <>
               <SelectCuentaNativo name="cuenta_origen_id" label="Cuenta origen" opciones={cuentas} />
               <SelectCuentaNativo name="cuenta_destino_id" label="Cuenta destino" opciones={cuentas} />
@@ -364,39 +359,6 @@ export function NuevaTransaccionForm({
               <SelectCuentaNativo name="cuenta_destino_id" label="Cuenta destino (a donde entra)" opciones={cuentasDivisa} />
               <CampoMonto name="monto_origen" label="Monto que entrega el cliente" />
               <CampoMonto name="monto_destino" label="Monto que recibe el cliente" />
-            </>
-          )}
-
-          {tipoOtro === "venta_monedas_billetes" && (
-            <>
-              <CampoCliente opcional />
-              <div>
-                <label className="field-label" htmlFor="subtipo">
-                  Tipo
-                </label>
-                <select
-                  id="subtipo"
-                  name="subtipo"
-                  required
-                  className="field-input"
-                  value={subtipoMonedas}
-                  onChange={(e) => setSubtipoMonedas(e.target.value as "monedas" | "billetes")}
-                >
-                  <option value="monedas">Monedas (S/2 por cada S/100)</option>
-                  <option value="billetes">Billetes (S/1 por cada S/100)</option>
-                </select>
-              </div>
-              <SelectCuentaNativo
-                name="cuenta_origen_id"
-                label="Cuenta de donde sale el efectivo normal"
-                opciones={cuentasPen}
-              />
-              <input
-                type="hidden"
-                name="cuenta_destino_id"
-                value={(subtipoMonedas === "monedas" ? cuentaMonedas : cuentaEfectivoPen)?.id ?? ""}
-              />
-              <CampoMonto name="monto_nominal" label="Monto nominal cambiado (S/)" />
             </>
           )}
 

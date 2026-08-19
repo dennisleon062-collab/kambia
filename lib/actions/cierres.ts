@@ -26,11 +26,9 @@ export async function realizarCierre(formData: FormData): Promise<Resultado> {
   const filas = cuentaIds.map((cuentaId) => {
     const saldo = saldos.find((s) => s.cuenta_id === cuentaId);
     const conteoMilagro = formData.get(`conteo_milagro_${cuentaId}`);
-    const conteoJuan = formData.get(`conteo_juan_${cuentaId}`);
 
     const saldoSistema = Number(saldo?.saldo ?? 0);
     const cMilagro = conteoMilagro !== null && conteoMilagro !== "" ? Number(conteoMilagro) : null;
-    const cJuan = conteoJuan !== null && conteoJuan !== "" ? Number(conteoJuan) : null;
 
     const diferenciaReal = cMilagro !== null ? Math.round((cMilagro - saldoSistema) * 100) / 100 : null;
 
@@ -50,7 +48,6 @@ export async function realizarCierre(formData: FormData): Promise<Resultado> {
       cuenta_id: cuentaId,
       saldo_sistema: saldoSistema,
       conteo_milagro: cMilagro,
-      conteo_juan: cJuan,
       diferencia_real: diferenciaReal,
       variacion_cambiaria: variacionCambiaria,
       estado,

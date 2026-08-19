@@ -2,12 +2,10 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import type { Rol } from "@/types/database.types";
 
 interface Item {
   href: string;
   label: string;
-  roles: Rol[];
   icon: (activo: boolean) => React.ReactNode;
   fab?: boolean;
 }
@@ -18,7 +16,6 @@ const ITEMS: Item[] = [
   {
     href: "/dashboard",
     label: "Bóveda",
-    roles: ["dueña"],
     icon: (a) => (
       <svg width="21" height="21" viewBox="0 0 21 21" fill="none" stroke={a ? "#14170f" : "#8a8f7d"} strokeWidth="1.7">
         <rect x="3" y="7" width="15" height="11" rx="2" />
@@ -29,7 +26,6 @@ const ITEMS: Item[] = [
   {
     href: "/tipo-cambio",
     label: "Cambio",
-    roles: ["dueña", "trabajador"],
     icon: (a) => (
       <svg width="21" height="21" viewBox="0 0 21 21" fill="none" stroke={stroke(a)} strokeWidth="1.7">
         <path d="M4 7h11M13 4.5L15.5 7 13 9.5" />
@@ -40,7 +36,6 @@ const ITEMS: Item[] = [
   {
     href: "/depositos",
     label: "Depósitos",
-    roles: ["dueña"],
     icon: (a) => (
       <svg width="21" height="21" viewBox="0 0 21 21" fill="none" stroke={stroke(a)} strokeWidth="1.7">
         <rect x="4" y="6" width="13" height="11" rx="2" />
@@ -49,20 +44,8 @@ const ITEMS: Item[] = [
     ),
   },
   {
-    href: "/bitacora-juan",
-    label: "Bitácora",
-    roles: ["trabajador"],
-    icon: (a) => (
-      <svg width="21" height="21" viewBox="0 0 21 21" fill="none" stroke={stroke(a)} strokeWidth="1.7">
-        <rect x="4" y="4" width="13" height="13" rx="2" />
-        <path d="M7 9h7M7 12.5h7M7 16h4" />
-      </svg>
-    ),
-  },
-  {
     href: "/transacciones/nueva",
     label: "Nuevo",
-    roles: ["dueña", "trabajador"],
     fab: true,
     icon: () => (
       <svg width="26" height="26" viewBox="0 0 26 26" fill="none" stroke="#14170f" strokeWidth="2.2">
@@ -73,7 +56,6 @@ const ITEMS: Item[] = [
   {
     href: "/fondo-juan",
     label: "Fondo",
-    roles: ["dueña"],
     icon: (a) => (
       <svg width="21" height="21" viewBox="0 0 21 21" fill="none" stroke={stroke(a)} strokeWidth="1.7">
         <rect x="4" y="5" width="13" height="12" rx="2" />
@@ -84,7 +66,6 @@ const ITEMS: Item[] = [
   {
     href: "/cierre",
     label: "Cierre",
-    roles: ["dueña", "trabajador"],
     icon: (a) => (
       <svg width="21" height="21" viewBox="0 0 21 21" fill="none" stroke={stroke(a)} strokeWidth="1.7">
         <rect x="4" y="9" width="13" height="9" rx="2" />
@@ -94,13 +75,12 @@ const ITEMS: Item[] = [
   },
 ];
 
-export function BottomNav({ rol }: { rol: Rol }) {
+export function BottomNav() {
   const pathname = usePathname();
-  const items = ITEMS.filter((i) => i.roles.includes(rol));
 
   return (
     <nav className="fixed bottom-0 left-0 right-0 z-10 flex items-end justify-between border-t border-ink/10 bg-white px-3 pb-[calc(9px+env(safe-area-inset-bottom))] pt-2.5">
-      {items.map((item) => {
+      {ITEMS.map((item) => {
         const activo = pathname.startsWith(item.href);
 
         if (item.fab) {

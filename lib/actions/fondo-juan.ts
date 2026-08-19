@@ -49,7 +49,6 @@ export async function entregarFondo(formData: FormData): Promise<Resultado> {
   }
 
   revalidatePath("/fondo-juan");
-  revalidatePath("/bitacora-juan");
   revalidatePath("/dashboard");
   return { error: null };
 }
@@ -102,7 +101,6 @@ export async function corregirMontoEntregado(formData: FormData): Promise<Result
   if (errorUpdate) return { error: errorUpdate.message };
 
   revalidatePath("/fondo-juan");
-  revalidatePath("/bitacora-juan");
   revalidatePath("/dashboard");
   revalidatePath("/historial");
   return { error: null };
@@ -164,38 +162,5 @@ export async function marcarAsumidoPorJuan(formData: FormData): Promise<Resultad
   if (error) return { error: error.message };
 
   revalidatePath("/fondo-juan");
-  return { error: null };
-}
-
-export async function registrarOperacionJuan(formData: FormData): Promise<Resultado> {
-  const fondoId = String(formData.get("fondo_diario_id"));
-  const tipoOperacion = String(formData.get("tipo_operacion") ?? "").trim();
-  if (!fondoId) return { error: "No hay fondo activo para hoy" };
-  if (!tipoOperacion) return { error: "Describa el tipo de operación" };
-
-  const supabase = await createClient();
-  const clienteTexto = (formData.get("cliente_texto") as string) || null;
-  const monedaOrigen = (formData.get("moneda_origen") as string) || null;
-  const montoOrigen = formData.get("monto_origen") ? Number(formData.get("monto_origen")) : null;
-  const monedaDestino = (formData.get("moneda_destino") as string) || null;
-  const montoDestino = formData.get("monto_destino") ? Number(formData.get("monto_destino")) : null;
-  const tcAplicado = formData.get("tc_aplicado") ? Number(formData.get("tc_aplicado")) : null;
-  const comentario = (formData.get("comentario") as string) || null;
-
-  const { error } = await supabase.from("movimientos_juan").insert({
-    fondo_diario_id: fondoId,
-    cliente_texto: clienteTexto,
-    tipo_operacion: tipoOperacion,
-    moneda_origen: monedaOrigen,
-    monto_origen: montoOrigen,
-    moneda_destino: monedaDestino,
-    monto_destino: montoDestino,
-    tc_aplicado: tcAplicado,
-    comentario,
-  });
-
-  if (error) return { error: error.message };
-
-  revalidatePath("/bitacora-juan");
   return { error: null };
 }

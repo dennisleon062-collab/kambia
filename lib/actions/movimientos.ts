@@ -3,7 +3,6 @@
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
 import { getUsuarioActual } from "@/lib/auth";
-import { getTasaComision, calcularComision } from "@/lib/queries/comisiones";
 import type { MovimientoTipo } from "@/types/database.types";
 
 type Resultado = { error: string | null };
@@ -40,9 +39,6 @@ export async function registrarMovimiento(formData: FormData): Promise<Resultado
       case "traspaso_banco_efectivo":
       case "traspaso_interno":
         return await registrarTraspaso(tipo, formData);
-
-      case "venta_monedas_billetes":
-        return await registrarVentaMonedasBilletes(formData);
 
       case "prestamo_a_cliente":
         return await registrarPrestamoCliente(formData);
@@ -145,43 +141,6 @@ export async function registrarMovimiento(formData: FormData): Promise<Resultado
       cuenta_destino_id: cuentaDestinoId,
       moneda_destino: cDestino.moneda_codigo,
       monto_destino: monto,
-      comentario,
-    });
-
-    return finalizar(error);
-  }
-
-  async function registrarVentaMonedasBilletes(fd: FormData): Promise<Resultado> {
-    const subtipo = str(fd, "subtipo") as "monedas" | "billetes" | null;
-    const cuentaOrigenId = str(fd, "cuenta_origen_id"); // de dónde sale el efectivo normal entregado
-    const cuentaDestinoId = str(fd, "cuenta_destino_id"); // boveda_monedas
-    const montoNominal = num(fd, "monto_nominal");
-
-    if (!subtipo) return { error: "Seleccione monedas o billetes" };
-    if (!cuentaOrigenId || !cuentaDestinoId) return { error: "Seleccione cuentas origen y destino" };
-    if (!montoNominal || montoNominal <= 0) return { error: "Ingrese un monto válido" };
-
-    const tasa = await getTasaComision(subtipo);
-    const comision = calcularComision(montoNominal, tasa);
-    const montoEntregado = Math.round((montoNominal - comision) * 100) / 100;
-
-    const [{ data: cOrigen }, { data: cDestino }] = await Promise.all([
-      supabase.from("cuentas").select("*").eq("id", cuentaOrigenId).single(),
-      supabase.from("cuentas").select("*").eq("id", cuentaDestinoId).single(),
-    ]);
-    if (!cOrigen || !cDestino) return { error: "Cuenta no encontrada" };
-
-    const { error } = await supabase.from("movimientos").insert({
-      tipo: "venta_monedas_billetes",
-      usuario_id: usuario.id,
-      cliente_texto: clienteTexto,
-      cuenta_origen_id: cuentaOrigenId,
-      moneda_origen: cOrigen.moneda_codigo,
-      monto_origen: montoEntregado,
-      cuenta_destino_id: cuentaDestinoId,
-      moneda_destino: cDestino.moneda_codigo,
-      monto_destino: montoNominal,
-      comision_calculada: comision,
       comentario,
     });
 

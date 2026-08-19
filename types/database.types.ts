@@ -122,20 +122,6 @@ export interface FondoDiario {
   creado_en: string;
 }
 
-export interface MovimientoJuan {
-  id: string;
-  fondo_diario_id: string;
-  hora: string;
-  cliente_texto: string | null;
-  tipo_operacion: string;
-  moneda_origen: MonedaCodigo | null;
-  monto_origen: number | null;
-  moneda_destino: MonedaCodigo | null;
-  monto_destino: number | null;
-  tc_aplicado: number | null;
-  comentario: string | null;
-}
-
 export interface CierreDiario {
   id: string;
   fecha: string;
